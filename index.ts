@@ -42,7 +42,7 @@ type KlineEvent = {
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
 const PERCENT_THRESHOLD =
-  Number(process.env.PERCENT_THRESHOLD ?? "3"); // %
+  Number(process.env.PERCENT_THRESHOLD ?? "5"); // %
 const BATCH_SIZE = Number(process.env.BATCH_SIZE ?? "100");
 
 // Exclude leveraged / synthetic tickers
@@ -141,13 +141,11 @@ function handleKlineEvent(ev: KlineEvent) {
   if (Math.abs(changePct) >= PERCENT_THRESHOLD) {
     alertedThisCandle.set(key, true);
 
-    const direction = changePct >= 0 ? "🚀 UP" : "🔻 DOWN";
+
+    const icon = changePct >= 0 ? "🟢" : "🔴";
+    const direction = changePct >= 0 ? "up" : "down";
     const msg =
-      `<b>${symbol}</b> ${direction}\n` +
-      `Price: <code>${current} ${formatPct(changePct)}</code>\n` +
-      `<a href="${binanceLink(symbol)}">Binance</a> · <a href="${tvLink(
-        symbol
-      )}">TradingView</a>`;
+      `${icon} <b>${symbol}</b> is ${direction}: <code>${current} ${formatPct(changePct)}</code>`
     // Fire & forget
     sendTelegram(msg).catch(console.error);
   }
